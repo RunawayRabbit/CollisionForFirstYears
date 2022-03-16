@@ -80,7 +80,8 @@ The answer is, it has to be both. Because as we just saw, you can quite happily 
 So our final test is:
 
 ```
-bool AABBOverlapsAABB(AABB a, AABB b)
+bool
+AABBOverlapsAABB(const AABB& a, const AABB& b)
 {
 	return
 	(a.max.x > b.min.x && b.max.x > a.min.x) &&
@@ -90,6 +91,35 @@ bool AABBOverlapsAABB(AABB a, AABB b)
 ```
 
 And there's the 2D case. The 3D case would be the exact same thing, you'd just add a .z test in there, in the exact same fashion.
+
+As a sidenote, this is the code for
+
+```
+struct AABB
+{
+	Vector2 min, max;
+}
+```
+
+If your AABBs are stored differently, this might be more what you're looking for. Hopefully you can see how they are equivalent!
+
+```
+struct AABB
+{
+	Vector2 pos, dim;
+}
+
+bool
+AABBOverlapsAABB(const AABB& a, const AABB& b)
+{
+	Vector2 aMax = a.pos + a.dim;
+	Vector2 bMax = b.pos + b.dim;
+
+	return
+	(aMax.x > b.pos.x && bMax.x > a.pos.x) &&
+	(aMax.y > b.pos.y && bMax.y > a.pos.y);
+}
+```
 
 ## Circles vs AABBs
 
