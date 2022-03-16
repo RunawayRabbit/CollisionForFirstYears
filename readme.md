@@ -92,7 +92,7 @@ AABBOverlapsAABB(const AABB& a, const AABB& b)
 
 And there's the 2D case. The 3D case would be the exact same thing, you'd just add a .z test in there, in the exact same fashion.
 
-As a sidenote, this is the code for
+As a sidenote, this is the code for this kind of AABB:
 
 ```
 struct AABB
@@ -100,8 +100,6 @@ struct AABB
 	Vector2 min, max;
 }
 ```
-
-So that's AABB tests in a nutshell. 
 
 If your AABBs are stored differently, this might be more what you're looking for. Hopefully you can see how they are equivalent!
 
@@ -123,6 +121,7 @@ AABBOverlapsAABB(const AABB& a, const AABB& b)
 }
 ```
 
+So that's AABB tests in a nutshell. 
 
 ## Circles vs AABBs
 
