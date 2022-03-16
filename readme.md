@@ -22,7 +22,7 @@ If you were to think about this for a while, you might try to consider all of th
 
 ![](img/two_lines_beside_eachother.png)
 
-Either the red line segment is completely to the left of the blue one, or the red line is completely to the right of the blue one. If neither of those is true, then the lines don't overlap.
+Either the red line segment is completely to the left of the blue one, or the red line is completely to the right of the blue one. If either of those is true, then the lines don't overlap.
 
 Another way of stating this is that
 
