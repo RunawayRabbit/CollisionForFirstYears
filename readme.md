@@ -32,7 +32,8 @@ That becomes a simple test to structure!
 
 ```!(red.max < blue.min || blue.max < red.min)```
 
-or rephrased to avoid the !
+or rephrased to avoid the !..
+
 ```(red.max > blue.min && blue.max > red.min)```
 
 ### Boxes
@@ -65,7 +66,31 @@ That's actually a general truth for all convex shapes, which is cool. But what a
 
 ### Getting To The Point 
 
+Using our overlapping test idea from before, we can extend to two dimensions.
+
 ```
 (red.max.x > purple.min.x && purple.max.x > red.min.x)
 (red.max.y > purple.min.y && purple.max.y > red.min.y)
 ```
+
+But there's one question left I guess, which is how do we **combine** these? Is it overlapping if either of the two 1D tests are true? or both of them?
+
+The answer is, it has to be both. Because as we just saw, you can quite happily overlap in one dimension and not the other, and still not be overlapping as a 2D shape. **Every dimension has to overlap for the shapes to actually overlap.**
+
+So our final test is:
+
+```
+bool AABBOverlapsAABB(AABB a, AABB b)
+{
+	return
+	(a.max.x > b.min.x && b.max.x > a.min.x) &&
+	(a.max.y > b.min.y && b.max.y > a.min.y);
+}
+
+```
+
+And there's the 2D case. The 3D case would be the exact same thing, you'd just add a .z test in there, in the exact same fashion.
+
+## Circles vs AABBs
+
+So that's AABB tests in a nutshell. The next thing you'd probably want is a circle vs AABB test.
