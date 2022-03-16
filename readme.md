@@ -234,3 +234,81 @@ CircleOverlapsAABB(const Circle& circle, const AABB& aabb)
 	return (sqMagnitude(difference) < circle.radius * circle.radius);
 }
 ```
+
+## Now With Movement
+
+Those tests are all well and good if you're dealing with fixed positions, but games where things don't move are not very good games. If you want movement then problems with these techniques start to emerge.
+
+First of all, let's talk about the phenomenon called Tunnelling. Tunnelling is when an electron's wave function collapses on the less probably side of an electric field or what Elon Musk does when he wants to get a taxi from downtown Las Vegas to the airport. It's also a bug in your collision code.
+
+![](img/tunnel_1.png)
+
+Imagine the earth is hurtling towards a gigantic, but very thin wall, and you're running collision detection to see if it hits the wall or not. (You are God in this scenario)
+
+![](img/tunnel_2.png)
+
+You first look at the Earth's velocity, and consider how much time has passed since the last time you looked at the Earth. Using this, you work out where the Earth should be, and check to see if it's overlapping.
+
+![](img/tunnel_3.png)
+
+Damn that's kinda close. No contact though, so it's kosher. (You are Yhwh in this scenario.) So you go off and do something else for a while and then come back later. You repeat the process. Step 1, use Velocity and Time Elapsed to work out where the Earth should be. Step 2, see if that new position collides with anything. Yep, looks good to me! All is good.
+
+Hopefully you see the problem. So what's the solution?
+
+### Solution Number 1: Just Update More, Bro! (The Dumb Method)
+
++ **PROS:** It's Easy
++ **CONS:** It's Shit
+
+"That's dumb", you say. "Lookit those huge gaps. Only an idiot would have such huge gaps. Just run more updates and you'll be fine."
+
+![](img/tunnel_4.png)
+
+This is true. This totally works in most cases. But there are edge cases. For example, if we sample twice as often, but objects move twice as fast, then we have the same problems. Another edge case is very small colliders that slot into the lil' gaps.
+
+![](img/tunnel_5.png)
+
+That's not why it's a dumb solution, though. It's dumb because it's **inherently inaccurate**.
+
+This Earthy Roundboy is about to hit this Bouncy Redboy and we want him to bounce off. We have clearly detected a collision, so now we do the bounce. How do we do that, exactly? Turn him around and throw him in the opposite direction, of course! But.. how do we DO that?
+
+Option 1: He "bounces" from where he is.
+Option 2: He "bounces" from where he "collided".
+
+![](img/inaccuracy_1.png)
+
+As you can see, neither of these options are what we actually wanted. Either we bounce him early, meaning he never touches the wall and actually bounces without touching, or he embeds himself into the surface then bounces himself out later (potentially causing another collision on the next frame, cuz now he's embedded inside the Bouncy Redboy)
+
+These options both suck. They're inaccurate, and worse still, the degree of inaccuracy is dependent on the speed that Earthy was moving as well as the physics timestep we're choosing. In the worst-case, the consistency of collision detection can become dependent on the framerate! **Can you imagine a game where a lag spike causes you to FALL THROUGH THE FLOOR?!** Because that's the road you're on, my friend.
+
+Clearly we can do better.
+
+### Solution Number 2: Just Binary Search, Bro! (The Big Brain Method)
+
++ **PROS:** It (mostly) actually works
++ **CONS:** It's a lil' bit more complicated/expensive.
+
+This is why they taught you algorithms dude. To prepare you for *THIS MOMENT*. Brace yerselves.
+
+![](img/binary_search_1.png)
+
+Imagine a circle that encompasses both the starting point and the projected ending point of our dear Earthy. This new circle would have it's center point in the exact center of the line between the start and end circle centers. I won't give the math away for anyone who wants to think about how to construct this circle, but if you want a hint, the center would be the average of the start and end circle centers and the radius would be half of the total distance, plus whatever the radii are of the two circles.
+
+![](img/binary_search_2.png)
+
+If we find nothing that collides with this bigger circle, then we know we have no collision and we can do the move, woop! But if we *DO* find a collision, we can, you guessed it, **BINARY SEARCH**! Redo the test, but replace the old endpoint with the midpoint.
+
+![](img/binary_search_3.png)
+
+If the new test collides, then we know the collision happens in the FIRST half of the travel time. If it doesn't, then we know it happens in the OTHER half. So we change our start and endpoints accordingly!
+
+
+There's a caveat, though. Y'see this is.. sort of an infinite loop. It gets closer and closer to the right answer with every iteration, but you need to know when to tell it to stop. The best way to do that is to define some minimum timestep that you can take before you call it "good enough", then just exit recursion when you reach that value.
+
+### Seems Good?
+
+Why is this better? First of all, no tunnelling guarantee! Nothing will EVER tunnel in this system.
+
+Second of all, it's as accurate as you want to make it! You choose the minimum timestep, so you choose how good of an answer you wanna get!
+
+Sounds awesome right? Nothing could be better, right? It's got an algorithm in it and everything! Well then..
