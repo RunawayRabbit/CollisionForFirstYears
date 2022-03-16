@@ -1,2 +1,71 @@
-## Test
-![](/img/not_overlapping.png)
+# Euan's Way-Too-Long Collision Detection Thing
+
+Hello everyone, welcome to my TEDTalk. This was supposed to be a quick explainer on basic collision detection of AABBs and Circles, but it kind of ballooned out into a mini-course. I hope it's useful cuz it took way longer than I expected.
+
+## AABB Tests
+
+### Simplify First: One Dimension
+
+Conceptually, an AABB is a set of `n` ranges where `n` is the number of dimensions you're dealing with. To make that a bit more concrete, let's start with one dimension. Consider a line segment.
+
+![](img/min_max.png)
+
+A "Line" would be the white-ish line in this drawing, and it goes to infinity in both directions. A "Ray" can be defined as "Half A Line". That is, it has a beginning, but it has no end. It starts somewhere and goes to infinity. A "Line Segment" has a beginning *and* an end. There's some terminology for ya!
+ 
+Now let's consider a second line segment:
+
+![](img/two_line_segments.png)
+
+Now ask yourself the question, **"do these lines overlap?"** The answer is clear from the picture, but if you only had the `min`/`max` values for both lines, could you work it out?
+
+If you were to think about this for a while, you might try to consider all of the cases for how they can overlap, but I'll do you a favour and tell you: it's easier to think of the ways that they can **not** overlap. Why? Because there's only a couple of 'em.
+
+![](img/two_lines_beside_eachother.png)
+
+Either the red line segment is completely to the left of the blue one, or the red line is completely to the right of the blue one. If neither of those is true, then the lines don't overlap.
+
+Another way of stating this is that
+
+> if the left-most (ie: the minimum) point on the red line is to the right (greater than) of the right-most (maximum) of the blue line, no overlap exists. Or vica verca.
+
+That becomes a simple test to structure!
+
+```!(red.max < blue.min || blue.max < red.min)```
+
+or rephrased to avoid the !
+```(red.max > blue.min && blue.max > red.min)```
+
+### Boxes
+
+So that's cool. But those are lines, lines aren't boxes, fuck off with your lines and min/maxes Euan we're doing boxes today and I don't see any boxes.
+
+Don't worry, we're half way there! we have a 1D test, we just need to extend it into 2D. Consider a box.
+
+![](img/a_box.png)
+
+Now let's draw some axes on it.
+
+![](img/a_box_with_axes.png)
+
+so we already know how to test overlaps on lines. And the X axis is a line, right? so..
+
+![](img/aabb_x_axis.png)
+
+If we introduce a second box, we can now do the exact same test to see if they overlap in X.
+
+![](img/aabb_2.png)
+
+if they don't overlap in 1D, then they cannot overlap in 2D. Look at this picture and try to imagine a place where you can put the red box where it overlaps with purple, without the min/max ranges overlapping in the X axis. Can't do it! 
+
+That's actually a general truth for all convex shapes, which is cool. But what about if they do overlap in X?
+
+![](img/aabb_3.png)
+
+**They still might not overlap.** The way we test to see if they do, as you might've guessed.. is to do the exact same thing we did before. We just do it on the other axis.
+
+### Getting To The Point 
+
+```
+(red.max.x > purple.min.x && purple.max.x > red.min.x)
+(red.max.y > purple.min.y && purple.max.y > red.min.y)
+```
