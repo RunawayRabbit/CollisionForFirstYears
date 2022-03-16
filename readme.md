@@ -131,8 +131,8 @@ The next thing you'd probably want is a circle vs AABB test, because balls are n
 ```
 struct circle
 {
-  Vector2 center;
-  float radius;
+	Vector2 center;
+	float radius;
 }
 ```
 
@@ -196,7 +196,7 @@ CircleOverlapsAABB(const Circle& circle, const AABB& aabb)
 	Vector2 closestPoint = ClosestPointInAABBToPoint(aabb, circle.center);
 	Vector2 difference = closestPoint - circle.center;
 
-	if(difference.magnitude() < circle.radius) return true;
+	if(magnitude(difference) < circle.radius) return true;
 	else return false;
 }
 ```
@@ -205,24 +205,22 @@ The magnitude of the vector, as you'll remember from Freya's lectures, just the 
 
 ```
 float
-Vector2::dot(const Vector2& a, const Vector2& b)
+dot(const Vector2& a, const Vector2& b)
 {
 	return a.x * b.x + a.y * b.y;
 }
 
 float
-Vector2::sqMagnitude()
+sqMagnitude(const Vector2& v)
 {
-	return dot(&this, &this);
+	return dot(v, v);
 }
 
 float
-Vector2::magnitude()
+Vector2::magnitude(const Vector2& v)
 {
-	return sqrt(this.sqMagnitude);
+	return sqrt(sqMagnitude(v));
 }
-
-
 ```
 
 If you're fancy, though, you'll probably know that for this kind of `>` or `<` comparison, you don't actually *need* the magnitude of the vector. You can skip the square root and just do this instead: 
@@ -234,7 +232,6 @@ CircleOverlapsAABB(const Circle& circle, const AABB& aabb)
 	Vector2 closestPoint = ClosestPointInAABBToPoint(aabb, circle.center);
 	Vector2 difference = closestPoint - circle.center;
 
-	return 
-	(difference.sqMagnitude() < circle.radius * circle.radius);
+	return (sqMagnitude(difference) < circle.radius * circle.radius);
 }
 ```
