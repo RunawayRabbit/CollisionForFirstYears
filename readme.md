@@ -9,7 +9,9 @@ GitHub doesn't like these pages when they're too long so unfortunately I've had 
 [Circle vs AABB Tests](2.md)
 
 [Moving Circle vs AABB](3.md)
+  [Collision Ordering](3-1.md)
 
 [Minkowski Shennanigans](4.md)
+  [Minkowski Examples](4-1.md)
 
 [Swept Circle vs AABB Test](5.md)
